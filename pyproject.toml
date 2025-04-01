@@ -1,18 +1,20 @@
 [project]
 name = "county"
 version = "0.1.0"
-description = ""
+description = "Python package to create and maintain a database of clubs, teams, competitions, results and more for Camogie / LGFA / GAA competitions within a County"
+license = { text = "MIT" }
 authors = [
     {name = "bamacgabhann",email = "127785144+breandan.macgabhann@users.noreply.github.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "sqlalchemy (>=2.0.40,<3.0.0)",
+    "geoalchemy2 (>=0.17.1,<0.18.0)"
 ]
 
 [tool.poetry]
 packages = [{include = "county", from = "src"}]
-
 
 [tool.poetry.group.dev.dependencies]
 ipywidgets = "^8.1.5"
@@ -21,6 +23,9 @@ flake8 = "^7.2.0"
 isort = "^6.0.1"
 pre-commit = "^4.2.0"
 ipykernel = "^6.29.5"
+
+[tool.isort]
+profile = "black"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
