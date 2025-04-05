@@ -2,31 +2,34 @@
 name = "county"
 version = "0.1.0"
 description = "Python package to create and maintain a database of clubs, teams, competitions, results and more for Camogie / LGFA / GAA competitions within a County"
-license = { text = "MIT" }
-authors = [
-    {name = "bamacgabhann",email = "127785144+breandan.macgabhann@users.noreply.github.com"}
-]
-readme = "README.md"
+authors = [{ name = "bamacgabhann", email = "127785144+breandan.macgabhann@users.noreply.github.com" }]
 requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
 dependencies = [
-    "sqlalchemy (>=2.0.40,<3.0.0)",
-    "geoalchemy2 (>=0.17.1,<0.18.0)"
+    "geoalchemy2>=0.17.1",
+    "sqlalchemy>=2.0.40",
 ]
 
-[tool.poetry]
-packages = [{include = "county", from = "src"}]
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.5",
+    "pre-commit>=4.2.0",
+]
 
-[tool.poetry.group.dev.dependencies]
-ipywidgets = "^8.1.5"
-black = "^25.1.0"
-flake8 = "^7.2.0"
-isort = "^6.0.1"
-pre-commit = "^4.2.0"
-ipykernel = "^6.29.5"
+[tool.hatch.build.targets.sdist]
+include = ["src/county"]
+
+[tool.hatch.build.targets.wheel]
+include = ["src/county"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/county" = "county"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.isort]
 profile = "black"
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
