@@ -10,6 +10,8 @@ from create_schema import (  # player_competition_association,; PlayerParticipat
     Team,
     Venue,
     engine,
+    player_team_association,
+    team_club_association,
 )
 from sqlalchemy.orm import sessionmaker
 
@@ -67,7 +69,7 @@ def add_group(group_id, name, competition_id, division_id):
         session.commit()
 
 
-def add_team(team_id, name, competition_id, division_id, group_id, club_id=None):
+def add_team(team_id, name, competition_id, division_id, group_id, club_ids):
     team = Team(
         id=team_id,
         name=name,
@@ -77,10 +79,11 @@ def add_team(team_id, name, competition_id, division_id, group_id, club_id=None)
     )
     with Session() as session:
         session.add(team)
-        if club_id:
-            club = session.query(Club).get(club_id)
-            team.clubs.append(club)
-            club.teams.append(team)
+        for club_id in club_ids:
+            association = team_club_association.insert().values(
+                team_id=team_id, club_id=club_id
+            )
+            session.execute(association)
         session.commit()
 
 
@@ -89,11 +92,12 @@ def add_match(
     home_team_id,
     away_team_id,
     venue_id,
-    competition_id,
-    division_id,
-    group_id,
     date,
     time,
+    competition_id,
+    division_id,
+    group_id=None,
+    stage="group",
     referee_id=None,
 ):
     match = Match(
@@ -101,11 +105,12 @@ def add_match(
         home_team_id=home_team_id,
         away_team_id=away_team_id,
         venue_id=venue_id,
+        date=date,
+        time=time,
         competition_id=competition_id,
         division_id=division_id,
         group_id=group_id,
-        date=date,
-        time=time,
+        stage=stage,
         referee_id=referee_id,
     )
     with Session() as session:
@@ -127,15 +132,17 @@ def add_player_participation(match_id, player_id, team_id, started=False):
 
 def add_team_club_association(team_id, club_id):
     with Session() as session:
-        team = session.get(Team, team_id)
-        club = session.get(Club, club_id)
-        team.clubs.append(club)
+        association = team_club_association.insert().values(
+            team_id=team_id, club_id=club_id
+        )
+        session.execute(association)
         session.commit()
 
 
 def add_player_team_association(player_id, team_id):
     with Session() as session:
-        player = session.get(Player, player_id)
-        team = session.get(Team, team_id)
-        player.teams.append(team)
+        association = player_team_association.insert().values(
+            player_id=player_id, team_id=team_id
+        )
+        session.execute(association)
         session.commit()
