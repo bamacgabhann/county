@@ -10,7 +10,6 @@ from sqlalchemy import (
     String,
     Table,
     Time,
-    create_engine,
     func,
 )
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -331,7 +330,3 @@ class LeagueTable(Base):
 # engine = create_engine(
 #    "postgresql://your_username:your_password@localhost/your_database"
 # )
-
-engine = create_engine("sqlite:///../../data/LimerickCamogie2025.db")
-
-Base.metadata.create_all(engine)
