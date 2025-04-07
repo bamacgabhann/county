@@ -1,4 +1,5 @@
 import os
+from functools import wraps
 
 import pandas as pd
 from sqlalchemy import create_engine, inspect
@@ -37,11 +38,29 @@ from .update_matches import (  # noqa F401
     update_player_participation,
     update_score,
 )
-from .utils import with_session  # noqa F401
 
 # Global variable to store the engine
 engine = None
 Session = None
+
+
+def with_session(func):
+    """Decorator to manage SQLAlchemy sessions."""
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        session = Session()
+        try:
+            result = func(session, *args, **kwargs)
+            session.commit()
+            return result
+        except Exception:
+            session.rollback()
+            raise
+        finally:
+            session.remove()
+
+    return wrapper
 
 
 def get_engine(db_url=None):

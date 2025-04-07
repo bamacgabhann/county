@@ -1,3 +1,4 @@
+from . import with_session
 from .create_schema import (  # player_competition_association,; PlayerParticipation,
     Club,
     Competition,
@@ -12,7 +13,6 @@ from .create_schema import (  # player_competition_association,; PlayerParticipa
     player_team_association,
     team_club_association,
 )
-from .utils import with_session
 
 
 @with_session

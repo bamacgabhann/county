@@ -1,7 +1,7 @@
 import logging
 
+from . import with_session
 from .create_schema import LeagueTable, Match, PlayerParticipation
-from .utils import with_session
 
 
 @with_session
