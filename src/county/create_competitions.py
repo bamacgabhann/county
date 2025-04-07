@@ -2,70 +2,140 @@ from create_schema import (  # player_competition_association,; PlayerParticipat
     Club,
     Competition,
     Division,
+    Group,
     Match,
     Player,
+    PlayerParticipation,
+    Referee,
     Team,
+    Venue,
     engine,
 )
 from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker(bind=engine)
-session = Session()
 
 
-def add_club(name, location):
-    club = Club(name=name, location=location)
-    session.add(club)
-    session.commit()
+def add_club(club_id, name, ainm=None, location=None):
+    club = Club(id=club_id, name=name, ainm=ainm, location=location)
+    with Session() as session:
+        session.add(club)
+        session.commit()
 
 
-def add_player(name, ainm, age, grade, club_name):
-    player = Player(name=name, ainm=ainm, age=age, grade=grade, club_name=club_name)
-    session.add(player)
-    session.commit()
+def add_referee(referee_id, name, club_id):
+    referee = Referee(id=referee_id, name=name, club_id=club_id)
+    with Session() as session:
+        session.add(referee)
+        session.commit()
 
 
-def add_competition(name, grade):
-    competition = Competition(name=name, grade=grade)
-    session.add(competition)
-    session.commit()
+def add_venue(venue_id, name, club_id, location):
+    venue = Venue(id=venue_id, name=name, club_id=club_id, location=location)
+    with Session() as session:
+        session.add(venue)
+        session.commit()
 
 
-def add_division(name, competition_id):
-    division = Division(name=name, competition_id=competition_id)
-    session.add(division)
-    session.commit()
+def add_player(player_id, name, ainm, club_id):
+    player = Player(id=player_id, name=name, ainm=ainm, club_id=club_id)
+    with Session() as session:
+        session.add(player)
+        session.commit()
 
 
-def add_team(name, club_name, division_id):
-    team = Team(name=name, club_name=club_name, division_id=division_id)
-    session.add(team)
-    session.commit()
+def add_competition(competition_id, name):
+    competition = Competition(id=competition_id, name=name)
+    with Session() as session:
+        session.add(competition)
+        session.commit()
+
+
+def add_division(division_id, name, competition_id):
+    division = Division(id=division_id, name=name, competition_id=competition_id)
+    with Session() as session:
+        session.add(division)
+        session.commit()
+
+
+def add_group(group_id, name, competition_id, division_id):
+    group = Group(
+        id=group_id, name=name, competition_id=competition_id, division_id=division_id
+    )
+    with Session() as session:
+        session.add(group)
+        session.commit()
+
+
+def add_team(team_id, name, competition_id, division_id, group_id, club_id=None):
+    team = Team(
+        id=team_id,
+        name=name,
+        competition_id=competition_id,
+        division_id=division_id,
+        group_id=group_id,
+    )
+    with Session() as session:
+        session.add(team)
+        if club_id:
+            club = session.query(Club).get(club_id)
+            team.clubs.append(club)
+            club.teams.append(team)
+        session.commit()
 
 
 def add_match(
-    home_team_id, away_team_id, location, date, grade, competition_id, division_id
+    match_id,
+    home_team_id,
+    away_team_id,
+    venue_id,
+    competition_id,
+    division_id,
+    group_id,
+    date,
+    time,
+    referee_id=None,
 ):
     match = Match(
-        date=date,
+        id=match_id,
         home_team_id=home_team_id,
         away_team_id=away_team_id,
-        home_goals=None,
-        home_points=None,
-        away_goals=None,
-        away_points=None,
-        location=location,
-        grade=grade,
+        venue_id=venue_id,
         competition_id=competition_id,
         division_id=division_id,
+        group_id=group_id,
+        date=date,
+        time=time,
+        referee_id=referee_id,
     )
-    session.add(match)
-    session.commit()
+    with Session() as session:
+        session.add(match)
+        session.commit()
 
 
-# Example usage
-# add_club("Club A", "POINT(12.9715987 77.594566)")
-# add_competition("Competition A", "Under 16")
-# add_division("Division A", 1)
-# add_team("Team A", 1, 1)
-# add_match(1, 2, "POINT(12.9715987 77.594566)", date(2025, 3, 14), "Under 16", 1, 1)
+def add_player_participation(match_id, player_id, team_id, started=False):
+    participation = PlayerParticipation(
+        match_id=match_id,
+        player_id=player_id,
+        team_id=team_id,
+        started=started,
+    )
+    with Session() as session:
+        session.add(participation)
+        session.commit()
+
+
+def add_team_club_association(team_id, club_id):
+    with Session() as session:
+        team = session.get(Team, team_id)
+        club = session.get(Club, club_id)
+        team.clubs.append(club)
+        session.commit()
+
+
+def add_player_team_association(player_id, team_id):
+    with Session() as session:
+        player = session.get(Player, player_id)
+        team = session.get(Team, team_id)
+        player.teams.append(team)
+        session.commit()
