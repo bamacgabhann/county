@@ -14,8 +14,8 @@ from create_schema import (  # player_competition_association,; PlayerParticipat
 )
 
 
-def add_club(session, club_id, name, ainm=None, location=None):
-    club = Club(id=club_id, name=name, ainm=ainm, location=location)
+def add_club(session, club_id, name, ainm=None):
+    club = Club(id=club_id, name=name, ainm=ainm)
     session.add(club)
     session.commit()
 
@@ -26,8 +26,10 @@ def add_referee(session, referee_id, name, club_id):
     session.commit()
 
 
-def add_venue(session, venue_id, name, club_id, location):
-    venue = Venue(id=venue_id, name=name, club_id=club_id, location=location)
+def add_venue(session, venue_id, name, club_id, address=None, location=None):
+    venue = Venue(
+        id=venue_id, name=name, club_id=club_id, address=address, location=location
+    )
     session.add(venue)
     session.commit()
 

@@ -46,9 +46,6 @@ class Club(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     ainm: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    location: Mapped[Optional[WKBElement]] = mapped_column(
-        Geometry(geometry_type="POINT", srid=4326), nullable=True
-    )  # Geospatial data
     referees: Mapped[Optional[List["Referee"]]] = relationship(back_populates="club")
     venues: Mapped[Optional[List["Venue"]]] = relationship(back_populates="club")
     players: Mapped[Optional[List["Player"]]] = relationship(back_populates="club")
@@ -57,7 +54,10 @@ class Club(Base):
     )
 
     def __str__(self):
-        return f"Club {self.id}: {self.name} / {self.ainm}"
+        if self.ainm:
+            return f"Club {self.id}: {self.name} / {self.ainm}"
+        else:
+            return f"Club {self.id}: {self.name}"
 
 
 class Referee(Base):
@@ -76,6 +76,7 @@ class Venue(Base):
     __tablename__ = "venues"
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
+    address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     club_id = mapped_column(ForeignKey("clubs.id"), nullable=False)
     location: Mapped[Optional[WKBElement]] = mapped_column(
         Geometry(geometry_type="POINT", srid=4326), nullable=True
