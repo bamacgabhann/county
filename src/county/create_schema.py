@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-from geoalchemy2 import Geometry, WKBElement
 from sqlalchemy import (
     Boolean,
     Column,
@@ -78,9 +77,6 @@ class Venue(Base):
     name: Mapped[str] = mapped_column(String, nullable=False)
     address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     club_id = mapped_column(ForeignKey("clubs.id"), nullable=False)
-    location: Mapped[Optional[WKBElement]] = mapped_column(
-        Geometry(geometry_type="POINT", srid=4326), nullable=True
-    )
     club: Mapped["Club"] = relationship(back_populates="venues")
     matches: Mapped[Optional[List["Match"]]] = relationship(back_populates="venue")
 

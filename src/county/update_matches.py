@@ -1,8 +1,10 @@
 import logging
 
-from create_schema import LeagueTable, Match, PlayerParticipation
+from .create_schema import LeagueTable, Match, PlayerParticipation
+from .utils import with_session
 
 
+@with_session
 def update_score(
     session,
     match_id,
@@ -91,6 +93,7 @@ def update_score(
         logging.warning("update_score: No match found for id %s", match_id)
 
 
+@with_session
 def update_player_participation(session, match_id, player_id, team_id, started):
     if (
         player_participation := session.query(PlayerParticipation)

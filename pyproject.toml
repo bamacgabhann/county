@@ -8,6 +8,7 @@ readme = "README.md"
 license = { text = "MIT" }
 dependencies = [
     "geoalchemy2>=0.17.1",
+    "pandas>=2.2.3",
     "sqlalchemy>=2.0.40",
 ]
 
