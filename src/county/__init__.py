@@ -35,8 +35,8 @@ from .create_schema import (  # noqa F401
     team_club_association,
 )
 from .update_matches import (  # noqa F401
+    add_result,
     update_player_participation,
-    update_score,
 )
 
 # Global variable to store the engine
@@ -58,9 +58,22 @@ def with_session(func):
             session.rollback()
             raise
         finally:
-            session.remove()
+            Session.remove()
 
     return wrapper
+
+
+# add_club = with_session(add_club)
+# add_competition = with_session(add_competition)
+# add_division = with_session(add_division)
+# add_group = with_session(add_group)
+# add_match = with_session(add_match)
+# add_player_participation = with_session(add_player_participation)
+# add_player_team_association = with_session(add_player_team_association)
+# add_referee = with_session(add_referee)
+# add_team = with_session(add_team)
+# add_team_club_association = with_session(add_team_club_association)
+# add_venue = with_session(add_venue)
 
 
 def get_engine(db_url=None):

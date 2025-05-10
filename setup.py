@@ -25,10 +25,10 @@ Session = initialise(db_url)
 
 session = Session()  # Create a session object
 
-add_clubs(session=session, clubs_df=clubs_df)
-add_referees(session=session, referees_df=referees_df)
-add_venues(session=session, venues_df=venues_df)
-add_competitions(session=session, competitions_df=competitions_df)
-add_divisions(session=session, divisions_df=divisions_df)
-add_groups(session=session, groups_df=groups_df)
-add_teams(session=session, teams_df=teams_df)
+add_clubs(clubs_df=clubs_df)
+add_referees(referees_df=referees_df)
+add_venues(venues_df=venues_df)
+add_competitions(competitions_df=competitions_df)
+add_divisions(divisions_df=divisions_df)
+add_groups(groups_df=groups_df)
+add_teams(teams_df=teams_df)
