@@ -75,7 +75,7 @@ class Venue(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
     address: Mapped[Optional[str]] = mapped_column(String, nullable=True)
-    club_id = mapped_column(ForeignKey("clubs.id"), nullable=False)
+    club_id = mapped_column(ForeignKey("clubs.id"), nullable=True)
     club: Mapped["Club"] = relationship(back_populates="venues")
     matches: Mapped[Optional[List["Match"]]] = relationship(back_populates="venue")
 
@@ -217,9 +217,6 @@ class Match(Base):
     stage: Mapped[str] = mapped_column(String, nullable=False)
     round: Mapped[str] = mapped_column(String, nullable=False)
     match_no: Mapped[int] = mapped_column(Integer, nullable=False)
-    league_table_id: Mapped[Optional[int]] = mapped_column(
-        ForeignKey("league_table.id"), nullable=True
-    )
     date: Mapped[Date] = mapped_column(Date, nullable=True)
     time: Mapped[Time] = mapped_column(Time, nullable=True)  # Time of the match
     referee_id = mapped_column(ForeignKey("referees.id"), nullable=True)

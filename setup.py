@@ -5,6 +5,7 @@ from county import (
     add_competitions,
     add_divisions,
     add_groups,
+    add_matches,
     add_referees,
     add_teams,
     add_venues,
@@ -20,6 +21,7 @@ groups_df = pd.read_csv("data/groups.csv", encoding="latin-1")
 referees_df = pd.read_csv("data/referees.csv", encoding="latin-1")
 teams_df = pd.read_csv("data/teams.csv", encoding="latin-1")
 venues_df = pd.read_csv("data/venues.csv", encoding="latin-1")
+matches_df = pd.read_csv("data/matches.csv", encoding="latin-1")
 
 Session = initialise(db_url)
 
@@ -32,3 +34,4 @@ add_competitions(competitions_df=competitions_df)
 add_divisions(divisions_df=divisions_df)
 add_groups(groups_df=groups_df)
 add_teams(teams_df=teams_df)
+add_matches(matches_df=matches_df)

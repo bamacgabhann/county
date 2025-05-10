@@ -1,4 +1,5 @@
 import os
+from datetime import date, time
 from functools import wraps
 
 import pandas as pd
@@ -115,31 +116,33 @@ def initialise(db_url=None):
 def add_clubs(session, clubs_df):
     for idx, row in clubs_df.iterrows():
         club_id: int = row["club_id"]
-        name: str = row["name"]
+        club_name: str = row["name"]
         ainm: str | None = row["ainm"] if pd.notna(row["ainm"]) else None
-        add_club(session=session, club_id=club_id, name=name, ainm=ainm)
+        add_club(session=session, club_id=club_id, name=club_name, ainm=ainm)
 
 
 @with_session
 def add_referees(session, referees_df):
     for idx, row in referees_df.iterrows():
         referee_id: int = row["referee_id"]
-        name: str = row["name"]
+        ref_name: str = row["name"]
         club_id: int = row["club_id"]
-        add_referee(session=session, referee_id=referee_id, name=name, club_id=club_id)
+        add_referee(
+            session=session, referee_id=referee_id, name=ref_name, club_id=club_id
+        )
 
 
 @with_session
 def add_venues(session, venues_df):
     for idx, row in venues_df.iterrows():
         venue_id: int = row["venue_id"]
-        name: str = row["name"]
+        venue_name: str = row["name"]
         club_id: int = row["club_id"]
         address: str | None = row["address"] if pd.notna(row["address"]) else None
         add_venue(
             session=session,
             venue_id=venue_id,
-            name=name,
+            name=venue_name,
             club_id=club_id,
             address=address,
         )
@@ -149,20 +152,22 @@ def add_venues(session, venues_df):
 def add_competitions(session, competitions_df):
     for idx, row in competitions_df.iterrows():
         competition_id: int = row["competition_id"]
-        name: str = row["name"]
-        add_competition(session=session, competition_id=competition_id, name=name)
+        competition_name: str = row["name"]
+        add_competition(
+            session=session, competition_id=competition_id, name=competition_name
+        )
 
 
 @with_session
 def add_divisions(session, divisions_df):
     for idx, row in divisions_df.iterrows():
         division_id: int = row["division_id"]
-        name: str = row["name"]
+        division_name: str = row["name"]
         competition_id: int = row["competition_id"]
         add_division(
             session=session,
             division_id=division_id,
-            name=name,
+            name=division_name,
             competition_id=competition_id,
         )
 
@@ -171,13 +176,13 @@ def add_divisions(session, divisions_df):
 def add_groups(session, groups_df):
     for idx, row in groups_df.iterrows():
         group_id: int = row["group_id"]
-        name: str = row["name"]
+        group_name: str = row["name"]
         competition_id: int = row["competition_id"]
         division_id: int = row["division_id"]
         add_group(
             session=session,
             group_id=group_id,
-            name=name,
+            name=group_name,
             competition_id=competition_id,
             division_id=division_id,
         )
@@ -187,7 +192,7 @@ def add_groups(session, groups_df):
 def add_teams(session, teams_df):
     for idx, row in teams_df.iterrows():
         team_id: int = row["team_id"]
-        name: str = row["name"]
+        team_name: str = row["name"]
         competition_id: int = row["competition_id"]
         division_id: int = row["division_id"]
         group_id: int = row["group_id"]
@@ -198,12 +203,51 @@ def add_teams(session, teams_df):
         add_team(
             session=session,
             team_id=team_id,
-            name=name,
+            name=team_name,
             competition_id=competition_id,
             division_id=division_id,
             group_id=group_id,
             club_id1=club_id1,
             club_id2=club_id2,
+        )
+
+
+@with_session
+def add_matches(session, matches_df):
+    for idx, row in matches_df.iterrows():
+        match_id: int = row["match_id"]
+        home_team_id: int = (
+            row["home_team_id"] if pd.notna(row["home_team_id"]) else None
+        )
+        away_team_id: int = (
+            row["away_team_id"] if pd.notna(row["away_team_id"]) else None
+        )
+        venue_id: int = row["venue_id"] if pd.notna(row["venue_id"]) else None
+        competition_id: int = row["competition_id"]
+        division_id: int = row["division_id"]
+        stage: str = row["stage"]
+        group_round: str = row["group_round"]
+        match_no: int = row["match_no"]
+        group_id: int | None = row["group_id"] if pd.notna(row["group_id"]) else None
+        match_date: date | None = row["date"] if pd.notna(row["date"]) else None
+        match_time: time | None = row["time"] if pd.notna(row["time"]) else None
+        referee_id: int = row["referee_id"] if pd.notna(row["referee_id"]) else None
+
+        add_match(
+            session=session,
+            match_id=match_id,
+            home_team_id=home_team_id,
+            away_team_id=away_team_id,
+            venue_id=venue_id,
+            competition_id=competition_id,
+            division_id=division_id,
+            stage=stage,
+            group_round=group_round,
+            match_no=match_no,
+            group_id=group_id,
+            match_date=match_date,
+            match_time=match_time,
+            referee_id=referee_id,
         )
 
 

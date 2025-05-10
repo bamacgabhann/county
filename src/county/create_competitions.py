@@ -1,4 +1,4 @@
-from .create_schema import (  # player_competition_association,; PlayerParticipation,
+from .create_schema import (
     Club,
     Competition,
     Division,
@@ -101,8 +101,8 @@ def add_match(
     group_round,
     match_no,
     group_id=None,
-    date=None,
-    time=None,
+    match_date=None,
+    match_time=None,
     referee_id=None,
 ):
     match = Match(
@@ -116,8 +116,8 @@ def add_match(
         round=group_round,
         match_no=match_no,
         group_id=group_id,
-        date=date,
-        time=time,
+        date=match_date,
+        time=match_time,
         referee_id=referee_id,
     )
     session.add(match)
