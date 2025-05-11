@@ -290,14 +290,10 @@ def update_league_ranks(
                 session.query(Match)
                 .filter_by(group_id=group_id, stage="group")
                 .filter(
-                    (
-                        Match.home_team_id.in_(t.id for t in tied_teams)
-                    )  # Use combined IDs
-                    | (
-                        Match.away_team_id.in_(t.id for t in tied_teams)
-                    )  # Use combined IDs
-                )
-                .first()
+                    Match.home_team_id.in_(t.id for t in tied_teams)
+                )  # Use combined IDs
+                .filter(Match.away_team_id.in_(t.id for t in tied_teams))
+                .first()  # Use combined IDs
             )
             if h2h is not None and h2h.winner_id:
                 if h2h.winner_id == tied_teams[0].id:
