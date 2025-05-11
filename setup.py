@@ -21,7 +21,30 @@ groups_df = pd.read_csv("data/groups.csv", encoding="latin-1")
 referees_df = pd.read_csv("data/referees.csv", encoding="latin-1")
 teams_df = pd.read_csv("data/teams.csv", encoding="latin-1")
 venues_df = pd.read_csv("data/venues.csv", encoding="latin-1")
-matches_df = pd.read_csv("data/matches.csv", encoding="latin-1")
+matches_df = pd.read_csv(
+    "data/matches.csv",
+    encoding="latin-1",
+    dtype={
+        "match_id": "Int64",
+        "home_team_id": "Int64",
+        "away_team_id": "Int64",
+        "venue_id": "Int64",
+        "competition_id": "Int64",
+        "division_id": "Int64",
+        "stage": str,
+        "group_round": str,
+        "match_no": "Int64",
+        "group_id": "Int64",
+        "match_date_time": str,
+        "referee_id": "Int64",
+    },
+    engine="pyarrow",
+)
+matches_df["match_date_time"] = pd.to_datetime(
+    matches_df["match_date_time"], errors="coerce"
+)
+matches_df["match_date"] = matches_df["match_date_time"].dt.date
+matches_df["match_time"] = matches_df["match_date_time"].dt.time
 
 Session = initialise(db_url)
 

@@ -9,6 +9,7 @@ license = { text = "MIT" }
 dependencies = [
     "geoalchemy2>=0.17.1",
     "pandas>=2.2.3",
+    "pyarrow>=20.0.0",
     "sqlalchemy>=2.0.40",
 ]
 

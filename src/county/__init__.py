@@ -229,8 +229,12 @@ def add_matches(session, matches_df):
         group_round: str = row["group_round"]
         match_no: int = row["match_no"]
         group_id: int | None = row["group_id"] if pd.notna(row["group_id"]) else None
-        match_date: date | None = row["date"] if pd.notna(row["date"]) else None
-        match_time: time | None = row["time"] if pd.notna(row["time"]) else None
+        match_date: date | None = (
+            row["match_date"] if pd.notna(row["match_date"]) else None
+        )
+        match_time: time | None = (
+            row["match_time"] if pd.notna(row["match_time"]) else None
+        )
         referee_id: int = row["referee_id"] if pd.notna(row["referee_id"]) else None
 
         add_match(
@@ -248,6 +252,29 @@ def add_matches(session, matches_df):
             match_date=match_date,
             match_time=match_time,
             referee_id=referee_id,
+        )
+
+
+@with_session
+def add_new_results(session, new_results):
+    for idx, row in new_results.iterrows():
+        match_id: int = row["match_id"]
+        home_goals: int = row["home_goals"] if pd.notna(row["home_goals"]) else None
+        home_points: int = row["home_points"] if pd.notna(row["home_points"]) else None
+        away_goals: int = row["away_goals"] if pd.notna(row["away_goals"]) else None
+        away_points: int = row["away_points"] if pd.notna(row["away_points"]) else None
+        walkover: bool = row["walkover"] if pd.notna(row["walkover"]) else False
+        winner_id: int = row["winner_id"] if pd.notna(row["winner_id"]) else None
+
+        add_result(
+            session=session,
+            match_id=match_id,
+            home_goals=home_goals,
+            home_points=home_points,
+            away_goals=away_goals,
+            away_points=away_points,
+            walkover=walkover,
+            winner_id=winner_id,
         )
 
 
