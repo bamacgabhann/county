@@ -278,6 +278,177 @@ def add_new_results(session, new_results):
         )
 
 
+@with_session
+def generate_league_table_html(session, division_id):
+    """Generates HTML for a league table."""
+
+    # Start of HTML
+    html = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>League Table</title>
+        <style>
+            /* CSS styles */
+            body {{
+                font-family: sans-serif;
+            }}
+    .group-table .grid-row.head {
+        color: white;
+        background-color: rgba(0, 102, 0, 1);
+        font-family: "IBM Plex Sans", sans-serif;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0;
+        line-height: 1.25rem;
+        text-align: left;
+        height: 36px;
+        border-spacing: 0;
+        text-transform: capitalize;
+    }
+    .group-table .grid-row div {
+        padding-top: 7px;
+        padding-bottom: 9px;
+    }
+    .group-table .grid-row div.team {
+        padding-left: 20px;
+    }
+    .group-table .D, .group-table .GA, .group-table .GF, .group-table .L, .group-table .P, .group-table .PA, .group-table .PF, .group-table .W, .group-table .diff, .group-table .Pts, .group-table .rank {
+        text-align: center;
+        font-weight: 600;
+    }
+    .group-table .team {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .group-table .grid-row {
+        display: grid;
+        grid-template-columns: 1fr 6fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        color: #000000;
+        font-family: "IBM Plex Sans", sans-serif;
+        font-size: 1rem;
+        letter-spacing: 0;
+        line-height: 1.25rem;
+    }
+    .group-table .grid-row.odd {
+        background-color: white;
+    }
+    .group-table .grid-row.even {
+        background-color: rgba(0, 102, 0, 0.1);
+    }
+
+    .group-table .rank {
+      grid-column: 1;
+      grid-row: 1;
+    }
+    .group-table .team {
+      grid-column: 2;
+      grid-row: 1;
+    }
+    .group-table .P {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .group-table .W {
+      grid-column: 4;
+      grid-row: 1;
+    }
+    .group-table .D {
+      grid-column: 5;
+      grid-row: 1;
+    }
+    .group-table .L {
+      grid-column: 6;
+      grid-row: 1;
+    }
+    .group-table .GF {
+      grid-column: 7;
+      grid-row: 1;
+    }
+    .group-table .PF {
+      grid-column: 8;
+      grid-row: 1;
+    }
+    .group-table .GA {
+      grid-column: 9;
+      grid-row: 1;
+    }
+    .group-table .PA {
+      grid-column: 10;
+      grid-row: 1;
+    }
+
+    .group-table .diff {
+      grid-column: 11;
+      grid-row: 1;
+    }
+    .group-table .points {
+      grid-column: 12;
+      grid-row: 1;
+    }
+
+    td p {
+      text-align: center;
+    }
+
+    td h3 {
+      text-align: center;
+    }
+
+    </style>
+    </head>
+    <body>
+    """
+
+    groups = session.query(Group).filter_by(division_id=division_id).all()
+    for group in groups:
+        html += """
+        <div class="group-table">
+        <div class="grid-row head">
+        <div class="rank  "></div>
+        <div class="team  "></div>
+        <div class="P  ">P</div>
+        <div class="W  ">W</div>
+        <div class="D  ">D</div>
+        <div class="L  ">L</div>
+        <div class="GF  ">GF</div>
+        <div class="PF  ">PF</div>
+        <div class="GA  ">GA</div>
+        <div class="PA  ">PA</div>
+        <div class="diff  ">+/-</div>
+        <div class="Pts  ">Pts</div>
+        </div>
+        """
+
+        teams = session.query(Team).filter_by(group_id=group.id).all()
+        sorted_teams = sorted(teams, key=lambda team: team.league_rank)
+        for team in sorted_teams:
+            html += f"""
+            <div class="grid-row {'even' if team.league_rank % 2 == 0 else 'odd'}">
+                <div class="rank">{team.league_rank}</div>
+                <div class="team">{team.name}</div>
+                <div class="P">{team.played}</div>
+                <div class="W">{team.won}</div>
+                <div class="D">{team.drawn}</div>
+                <div class="L">{team.lost}</div>
+                <div class="GF">{team.goals_for}</div>
+                <div class="PF">{team.points_for}</div>
+                <div class="GA">{team.goals_against}</div>
+                <div class="PA">{team.points_against}</div>
+                <div class="diff">{team.scoring_difference_x_wo}</div>
+                <div class="points">{team.league_points}</div>
+            </div>
+            """
+    html += """
+            </body>
+            </html>
+            """
+    fname = f"outputs/league_table_{division_id}.html"
+    with open(fname, "w") as file:
+        file.write(html)
+
+
 name = "County Competitions"
 __version__ = "0.1.0"
 __author__ = "Breandán Anraoi MacGabhann"
