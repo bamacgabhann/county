@@ -114,7 +114,7 @@ def get_team_stats(
         if match.stage == "group":
             return (
                 session.query(Team)
-                .filter_by(team_id=team_id, group_id=match.group_id)
+                .filter_by(id=team_id, group_id=match.group_id)
                 .first()
             )
         logging.warning("get_team_stats: Match is not in group stage")
