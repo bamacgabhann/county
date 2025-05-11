@@ -165,21 +165,15 @@ def update_group_table_stats(
                 away_team_stats.won += 1
                 home_team_stats.fielded_all = False
         else:
-            home_score = (home_goals * 3) + home_points
-            away_score = (away_goals * 3) + away_points
             home_team_stats.goals_for += home_goals
             home_team_stats.points_for += home_points
-            home_team_stats.scores_for += home_score
             home_team_stats.goals_against += away_goals
             home_team_stats.points_against += away_points
-            home_team_stats.scores_against += away_score
 
             away_team_stats.goals_for += away_goals
             away_team_stats.points_for += away_points
-            away_team_stats.scores_for += away_score
             away_team_stats.goals_against += home_goals
             away_team_stats.points_against += home_points
-            away_team_stats.scores_against += home_score
 
             match_winner = determine_winner(
                 home_goals,
