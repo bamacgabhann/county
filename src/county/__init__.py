@@ -437,16 +437,26 @@ def generate_league_table_html(session, division_id):
                 <div class="GA">{team.goals_against}</div>
                 <div class="PA">{team.points_against}</div>
                 <div class="diff">{team.scoring_difference_x_wo}</div>
-                <div class="points">{team.league_points}</div>
+                <div class="Pts">{team.league_points}</div>
             </div>
             """
     html += """
             </body>
             </html>
             """
+    if not os.path.exists("outputs"):
+        os.makedirs("outputs")
     fname = f"outputs/league_table_{division_id}.html"
     with open(fname, "w") as file:
         file.write(html)
+
+
+@with_session
+def generate_all_tables(session):
+    """Generates HTML for all league tables."""
+    divisions = session.query(Division).all()
+    for division in divisions:
+        generate_league_table_html(session, division.id)
 
 
 name = "County Competitions"
