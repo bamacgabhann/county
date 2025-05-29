@@ -145,6 +145,7 @@ def update_group_table_stats(
     home_points=None,
     away_goals=None,
     away_points=None,
+    winner_id=None,
 ):
     if not (match := session.query(Match).filter_by(id=match_id).first()):
         return
@@ -164,6 +165,20 @@ def update_group_table_stats(
                 home_team_stats.lost += 1
                 away_team_stats.won += 1
                 home_team_stats.fielded_all = False
+        elif (
+            home_goals == 0
+            and home_points == 0
+            and away_goals == 0
+            and away_points == 0
+            and winner_id is not None
+        ):
+            if winner_id == match.home_team_id:
+                home_team_stats.won += 1
+                away_team_stats.lost += 1
+            else:
+                home_team_stats.lost += 1
+                away_team_stats.won += 1
+            match.winner_id = winner_id
         else:
             home_team_stats.goals_for += home_goals
             home_team_stats.points_for += home_points
@@ -226,7 +241,7 @@ def update_scores_x_wo(
             .filter_by(group_id=group_id, stage="group")
             .filter(
                 (Match.home_team_id.in_(team_and_x_wo_ids))  # Use combined IDs
-                | (Match.away_team_id.in_(team_and_x_wo_ids))  # Use combined IDs
+                & (Match.away_team_id.in_(team_and_x_wo_ids))  # Use combined IDs
             )
             .all()
         )
@@ -286,24 +301,69 @@ def update_league_ranks(
             tied_teams = [team for team in sorted_teams if team.league_points == points]
             tied_ranks = [team.league_rank for team in tied_teams]
 
-            h2h = (
-                session.query(Match)
-                .filter_by(group_id=group_id, stage="group")
-                .filter(
-                    Match.home_team_id.in_(t.id for t in tied_teams)
-                )  # Use combined IDs
-                .filter(Match.away_team_id.in_(t.id for t in tied_teams))
-                .first()  # Use combined IDs
-            )
-            if h2h is not None and h2h.winner_id:
-                if h2h.winner_id == tied_teams[0].id:
-                    # Team 1 wins the tie
-                    tied_teams[0].league_rank = min(tied_ranks)
-                    tied_teams[1].league_rank = max(tied_ranks)
-                else:
-                    # Team 2 wins the tie
-                    tied_teams[0].league_rank = max(tied_ranks)
-                    tied_teams[1].league_rank = min(tied_ranks)
+            if tied_teams[0].fielded_all != tied_teams[1].fielded_all:
+                continue
+            else:
+                h2h = (
+                    session.query(Match)
+                    .filter_by(group_id=group_id, stage="group")
+                    .filter(
+                        Match.home_team_id.in_(t.id for t in tied_teams)
+                    )  # Use combined IDs
+                    .filter(Match.away_team_id.in_(t.id for t in tied_teams))
+                    .first()  # Use combined IDs
+                )
+                if h2h is not None and h2h.winner_id:
+                    if h2h.winner_id == tied_teams[0].id:
+                        # Team 1 wins the tie
+                        tied_teams[0].league_rank = min(tied_ranks)
+                        tied_teams[1].league_rank = max(tied_ranks)
+                    else:
+                        # Team 2 wins the tie
+                        tied_teams[0].league_rank = max(tied_ranks)
+                        tied_teams[1].league_rank = min(tied_ranks)
+
+        elif count > 2:
+            tied_teams = [team for team in sorted_teams if team.league_points == points]
+            diff_counts = Counter(team.scoring_difference_x_wo for team in tied_teams)
+            for score_diff, count in diff_counts.items():
+                if count == 2:
+                    tied_teams_with_diff = [
+                        team
+                        for team in tied_teams
+                        if team.scoring_difference_x_wo == score_diff
+                    ]
+                    tied_ranks = [team.league_rank for team in tied_teams_with_diff]
+                    if (
+                        tied_teams_with_diff[0].fielded_all
+                        != tied_teams_with_diff[1].fielded_all
+                    ):
+                        continue
+                    else:
+                        h2h = (
+                            session.query(Match)
+                            .filter_by(group_id=group_id, stage="group")
+                            .filter(
+                                Match.home_team_id.in_(
+                                    t.id for t in tied_teams_with_diff
+                                )
+                            )  # Use combined IDs
+                            .filter(
+                                Match.away_team_id.in_(
+                                    t.id for t in tied_teams_with_diff
+                                )
+                            )
+                            .first()  # Use combined IDs
+                        )
+                        if h2h is not None and h2h.winner_id:
+                            if h2h.winner_id == tied_teams_with_diff[0].id:
+                                # Team 1 wins the tie
+                                tied_teams_with_diff[0].league_rank = min(tied_ranks)
+                                tied_teams_with_diff[1].league_rank = max(tied_ranks)
+                            else:
+                                # Team 2 wins the tie
+                                tied_teams_with_diff[0].league_rank = max(tied_ranks)
+                                tied_teams_with_diff[1].league_rank = min(tied_ranks)
 
 
 def add_result(
@@ -337,6 +397,7 @@ def add_result(
             home_points,
             away_goals,
             away_points,
+            winner_id,
         )
         update_league_ranks(session, match.group_id)
         update_knockout_teams(session, match.division_id)

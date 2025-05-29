@@ -3,7 +3,7 @@ name = "county"
 version = "0.1.0"
 description = "Python package to create and maintain a database of clubs, teams, competitions, results and more for Camogie / LGFA / GAA competitions within a County"
 authors = [{ name = "bamacgabhann", email = "127785144+breandan.macgabhann@users.noreply.github.com" }]
-requires-python = ">=3.11"
+requires-python = ">=3.11, <3.12"
 readme = "README.md"
 license = { text = "MIT" }
 dependencies = [

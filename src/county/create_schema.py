@@ -171,11 +171,17 @@ class Team(Base):
 
     @hybrid_property
     def scores_for(self):
-        return self.goals_for * 3 + self.points_for
+        if self.competition_id > 2:
+            return self.goals_for + self.points_for
+        else:
+            return self.goals_for * 3 + self.points_for
 
     @hybrid_property
     def scores_against(self):
-        return self.goals_against * 3 + self.points_against
+        if self.competition_id > 2:
+            return self.goals_against + self.points_against
+        else:
+            return self.goals_against * 3 + self.points_against
 
     @hybrid_property
     def scoring_difference(self):
@@ -183,15 +189,24 @@ class Team(Base):
 
     @hybrid_property
     def scores_for_x_wo(self):
-        return self.goals_for_x_wo * 3 + self.points_for_x_wo
+        if self.competition_id > 2:
+            return self.goals_for_x_wo + self.points_for_x_wo
+        else:
+            return self.goals_for_x_wo * 3 + self.points_for_x_wo
 
     @hybrid_property
     def scores_against_x_wo(self):
-        return self.goals_against_x_wo * 3 + self.points_against_x_wo
+        if self.competition_id > 2:
+            return self.goals_against_x_wo + self.points_against_x_wo
+        else:
+            return self.goals_against_x_wo * 3 + self.points_against_x_wo
 
     @hybrid_property
     def scoring_difference_x_wo(self):
-        return self.scores_for_x_wo - self.scores_against_x_wo
+        if self.competition_id > 2:
+            return -self.scores_against_x_wo
+        else:
+            return self.scores_for_x_wo - self.scores_against_x_wo
 
     @hybrid_property
     def league_points(self):
